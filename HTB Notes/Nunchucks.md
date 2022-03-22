@@ -22,7 +22,7 @@ PORT    STATE SERVICE  VERSION
 Service Info: OS: Linux; CPE: cpe:/o:linux:li
 ```
 Web server redirects to port 443 when trying to acess port 80.
-Start off enumerating with ferobuster to find hidden directories.
+So just start enumerating with ferobuster to find hidden directories on port 443.
 ```
 ./feroxbuster -w raft-large-directories.txt --url https://10.10.11.122 -k --silent
 https://10.10.11.122/
