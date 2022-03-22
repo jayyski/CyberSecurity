@@ -70,4 +70,4 @@ ________________________________________________
 
 store                   [Status: 200, Size: 4029, Words: 1053, Lines: 102]
 ```
-We found a sub domain at https://store.nunchucks.htb
+We find a sub domain at store.nunchucks.htb
