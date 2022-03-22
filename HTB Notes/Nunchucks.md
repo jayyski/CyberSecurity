@@ -21,8 +21,9 @@ PORT    STATE SERVICE  VERSION
 443/tcp open  ssl/http nginx 1.18.0 (Ubuntu)
 Service Info: OS: Linux; CPE: cpe:/o:linux:li
 ```
-Web server redirects to port 443 when trying to acess port 80.
-So just start enumerating with ferobuster to find hidden directories on port 443.
+Web server redirects to port 443 when trying to acess port 80
+
+So just start enumerating with ferobuster to find hidden directories on port 443
 ```
 ./feroxbuster -w raft-large-directories.txt --url https://10.10.11.122 -k --silent
 https://10.10.11.122/
@@ -43,7 +44,7 @@ https://10.10.11.122/Privacy
 https://10.10.11.122/Terms
 https://10.10.11.122/Signup
 ```
-Nothing interesting so I fuzz vhosts.
+Nothing interesting so I fuzz vhosts
 ```
 ffuf -w subdomains-top1million-110000.txt -u https://nunchucks.htb -H "Host: FUZZ.nunchucks.htb" -fs 30589
 
