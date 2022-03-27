@@ -73,6 +73,9 @@ ________________________________________________
 store                   [Status: 200, Size: 4029, Words: 1053, Lines: 102]
 ```
 Found a sub domain at store.nunchucks.htb
+```
+curl https://store.nunchucks.htb/api/submit -X POST -d '{"email":"{{7*7}}@htb.org"}'  --cookie "_csrf=t1HPrROfR6NOAdFvYqRq240M" -k -H "Content-Type: application/json" --proxy 127.0.0.1:8080 
+```
 
 Web server has ssti vulnverability in "email" parameter
 ```
