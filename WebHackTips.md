@@ -130,7 +130,7 @@ allowing an attack to succeed in discovering the existing password
 noninvasively.
 
  1. Identify any forgotten password functionality within the application. If 
-this is not explicitly linked from published content, it may still be implemented (see Chapter 4).
+this is not explicitly linked from published content, it may still be implemented (see Chapter 4).
 
  2. Understand how the forgotten password function works by doing a 
 complete walk-through using an account you control.
@@ -153,4 +153,102 @@ and attempt to identify any patterns that may enable you to predict the
 URLs issued to other users. Employ the same techniques as are relevant to 
 analyzing session tokens for predictability (see Chapter 7).
 
+```
+
+## Incomplete Validation of Credentials
+
+Well-designed authentication mechanisms enforce various requirements on 
+passwords, such as a minimum length or the presence of both uppercase and 
+lowercase characters. Correspondingly, some poorly designed authentication 
+mechanisms not only do not enforce these good practices but also do not take 
+into account users’ own attempts to comply with them.
+
+For example, some applications truncate passwords and therefore validate 
+only the first n characters. Some applications perform a case-insensitive check 
+of passwords. Some applications strip unusual characters (sometimes on the 
+pretext of performing input validation) before checking passwords. In recent 
+times, behavior of this kind has been identified in some surprisingly high-profile 
+web applications, usually as a result of trial and error by curious users.
+
+Each of these limitations on password validation reduces by an order of 
+magnitude the number of variations available in the set of possible passwords. 
+Through experimentation, you can determine whether a password is being 
+fully validated or whether any limitations are in effect. You can then fine-tune 
+your automated attacks against the login to remove unnecessary test cases, 
+thereby massively reducing the number of requests necessary to compromise 
+user accounts.
+```
+ 1. Using an account you control, attempt to log in with variations on your 
+own password: removing the last character, changing the case of a character, and removing any special typographical characters. If any of these 
+attempts is successful, continue experimenting to try to understand what 
+validation is actually occurring.
+
+ 2. Feed any results back into your automated password-guessing attacks to 
+remove superfluous test cases and improve the chances of success.
+```
+
+## Nounique Usernames
+Some applications that support self-registration allow users to specify their 
+own username and do not enforce a requirement that usernames be unique. 
+Although this is rare, the authors have encountered more than one application 
+with this behavior.
+
+This represents a design fl aw for two reasons:
+  One user who shares a username with another user may also happen to 
+select the same password as that user, either during registration or in a 
+subsequent password change. In this eventuality, the application either 
+rejects the second user’s chosen password or allows two accounts to 
+have identical credentials. In the fi rst instance, the application’s behavior 
+effectively discloses to one user the credentials of the other user. In the 
+second instance, subsequent logins by one of the users result in access to 
+the other user’s account.
+
+  An attacker may exploit this behavior to carry out a successful brute-force 
+attack, even though this may not be possible elsewhere due to restrictions 
+on failed login attempts. An attacker can register a specific username 
+multiple times with different passwords while monitoring for the differential response that indicates that an account with that username 
+and password already exists. The attacker will have ascertained a target 
+user’s password without making a single attempt to log in as that user.
+Badly designed self-registration functionality can also provide a means for 
+username enumeration. If an application disallows duplicate usernames, an 
+attacker may attempt to register large numbers of common usernames to identify the existing usernames that are rejected.
+```
+1. If self-registration is possible, attempt to register the same username 
+twice with different passwords.
+
+2. If the application blocks the second registration attempt, you can exploit 
+this behavior to enumerate existing usernames even if this is not possible 
+on the main login page or elsewhere. Make multiple registration attempts 
+with a list of common usernames to identify the already registered names 
+that the application blocks.
+
+3. If the registration of duplicate usernames succeeds, attempt to register 
+the same username twice with the same password, and determine the 
+application’s behavior:
+  a. If an error message results, you can exploit this behavior to carry out a 
+brute-force attack, even if this is not possible on the main login page. 
+Target an enumerated or guessed username, and attempt to register 
+this username multiple times with a list of common passwords. When 
+the application rejects a specific password, you have probably found 
+the existing password for the targeted account.
+  b. If no error message results, log in using the credentials you specified, and see what happens. You may need to register several users, 
+and modify different data held within each account, to understand 
+whether this behavior can be used to gain unauthorized access to 
+other users’ accounts
+```
+
+## Predictable Usernames 
+Some applications automatically generate account usernames according to 
+a predictable sequence (cust5331, cust5332, and so on). When an application 
+behaves like this, an attacker who can discern the sequence can quickly arrive 
+at a potentially exhaustive list of all valid usernames, which can be used as 
+the basis for further attacks
+```
+1. If the application generates usernames, try to obtain several in quick 
+succession, and determine whether any sequence or pattern can be 
+discerned.
+
+2. If it can, extrapolate backwards to obtain a list of possible valid usernames. This can be used as the basis for a brute-force attack against the 
+login and other attacks where valid usernames are required, such as the 
+exploitation of access control flaws.
 ```
