@@ -252,3 +252,176 @@ discerned.
 login and other attacks where valid usernames are required, such as the 
 exploitation of access control flaws.
 ```
+
+## Predictable Passwords
+
+In some applications, users are created all at once or in sizeable batches and are
+automatically assigned initial passwords, which are then distributed to them
+through some means. The means of generating passwords may enable an attacker
+to predict the passwords of other application users. This kind of vulnerability is
+more common on intranet-based corporate applications — for example, where
+every employee has an account created on her behalf and receives a printed
+notification of her password.
+In the most vulnerable cases, all users receive the same password, or one
+closely derived from their username or job function. In other cases, generated
+passwords may contain sequences that could be identifi ed or guessed with
+access to a very small sample of initial passwords
+```
+1. If the application generates passwords, try to obtain several in quick
+succession, and determine whether any sequence or pattern can be
+discerned.
+ 
+2. If it can, extrapolate the pattern to obtain a list of passwords for other
+application users.
+
+3. If passwords demonstrate a pattern that can be correlated with usernames, you can try to log in using known or guessed usernames and the
+corresponding inferred passwords.
+
+4. Otherwise, you can use the list of inferred passwords as the basis for a
+brute-force attack with a list of enumerated or common usernames.
+```
+## Insecure Distribution of Credentials
+
+```
+1. Obtain a new account. If you are not required to set all credentials during
+registration, determine the means by which the application distributes
+credentials to new users.
+
+2. If an account activation URL is used, try to register several new accounts
+in close succession, and identify any sequence in the URLs you receive.
+If a pattern can be determined, try to predict the activation URLs sent to
+recent and forthcoming users, and attempt to use these URLs to take ownership of their accounts.
+
+3. Try to reuse a single activation URL multiple times, and see if the application allows this. If not, try locking out the target account before reusing
+the URL, and see if it now works.
+```
+## Implementation Flaws in Authentication
+
+```
+1. Perform a complete, valid login using an account you control. Record
+every piece of data submitted to the application, and every response
+received, using your intercepting proxy.
+
+2. Repeat the login process numerous times, modifying pieces of the data
+submitted in unexpected ways. For example, for each request parameter
+or cookie sent by the client, do the following:
+ a. Submit an empty string as the value.
+ b. Remove the name/value pair altogether.
+ c. Submit very long and very short values.
+ d. Submit strings instead of numbers and vice versa.
+ e. Submit the same item multiple times, with the same and different
+values.
+
+3. For each malformed request submitted, review closely the application’s
+response to identify any divergences from the base case.
+
+4. Feed these observations back into framing your test cases. When one
+modification causes a change in behavior, try to combine this with other
+changes to push the application’s logic to its limits.
+```
+## Defects in Multi Stage Authentication
+
+```
+1. Perform a complete, valid login using an account you control. Record every
+piece of data submitted to the application using your intercepting proxy.
+
+2. Identify each distinct stage of the login and the data that is collected at
+each stage. Determine whether any single piece of information is collected
+more than once or is ever transmitted back to the client and resubmitted
+via a hidden form field, cookie, or preset URL parameter (see Chapter 5).
+
+3. Repeat the login process numerous times with various malformed
+requests:
+ a. Try performing the login steps in a different sequence.
+ b. Try proceeding directly to any given stage and continuing from there.
+ c. Try skipping each stage and continuing with the next.
+ d. Use your imagination to think of other ways to access the different
+stages that the developers may not have anticipated.
+
+4. If any data is submitted more than once, try submitting a different value
+at different stages, and see whether the login is still successful. It may
+be that some of the submissions are superfluous and are not actually
+processed by the application. It might be that the data is validated at one
+stage and then trusted subsequently. In this instance, try to provide the
+credentials of one user at one stage, and then switch at the next to actually authenticate as a different user. It might be that the same piece of
+data is validated at more than one stage, but against different checks. In
+this instance, try to provide (for example) the username and password of
+one user at the first stage, and the username and PIN of a different user
+at the second stage.
+ 
+5. Pay close attention to any data being transmitted via the client that was
+not directly entered by the user. The application may use this data to store
+information about the state of the login progress, and the application may
+trust it when it is submitted back to the server. For example, if the request
+for stage three includes the parameter stage2complete=true, it may
+be possible to advance straight to stage three by setting this value. Try to
+modify the values being submitted, and determine whether this enables
+you to advance or skip stages.
+```
+### Question & Answer Authentication Functionality
+
+The application may present a randomly chosen question and store the
+details within a hidden HTML form fi eld or cookie, rather than on the
+server. The user subsequently submits both the answer and the question
+itself. This effectively allows an attacker to choose which question to
+answer, enabling the attacker to repeat a login after capturing a user’s
+input on a single occasion.
+
+The application may present a randomly chosen question on each login
+attempt but not remember which question a given user was asked if he
+or she fails to submit an answer. If the same user initiates a fresh login
+attempt a moment later, a different random question is generated. This
+effectively allows an attacker to cycle through questions until he receives
+one to which he knows the answer, enabling him to repeat a login having
+captured a user’s input on a single occasion.
+
+The second of these conditions is really quite subtle, and as a result,
+many real-world applications are vulnerable. An application that challenges a
+user for two random letters of a memorable word may appear at fi rst glance
+to be functioning properly and providing enhanced security. However, if the
+letters are randomly chosen each time the previous authentication stage is
+passed, an attacker who has captured a user’s login on a single occasion can
+simply reauthenticate up to this point until the two letters that he knows are
+requested, without the risk of account lockout.
+```
+1. If one of the login stages uses a randomly varying question, verify whether
+the details of the question are being submitted together with the answer.
+If so, change the question, submit the correct answer associated with that
+question, and verify whether the login is still successful.
+ 
+2. If the application does not enable an attacker to submit an arbitrary
+question and answer, perform a partial login several times with a single
+account, proceeding each time as far as the varying question. If the question changes on each occasion, an attacker can still effectively choose
+which question to answer
+```
+
+## Insecure Storage of Credientials
+
+If an application stores login credentials insecurely, the security of the login
+mechanism is undermined, even though there may be no inherent fl aw in the
+authentication process itself.
+
+It is common to encounter web applications in which user credentials are
+stored insecurely within the database. This may involve passwords being
+stored in cleartext. But if passwords are being hashed using a standard algorithm such as MD5 or SHA-1, this still allows an attacker to simply look up
+observed hashes against a precomputed database of hash values
+
+```
+1. Review all of the application’s authentication-related functionality, as well
+as any functions relating to user maintenance. If you find any instances in
+which a user’s password is transmitted back to the client, this indicates
+that passwords are being stored insecurely, either in cleartext or using
+reversible encryption.
+
+2. If any kind of arbitrary command or query execution vulnerability is
+identified within the application, attempt to find the location within the
+application’s database or filesystem where user credentials are stored:
+ a. Query these to determine whether passwords are being stored in
+unencrypted form.
+ b. If passwords are stored in hashed form, check for nonunique values, indicating that an account has a common or default password
+assigned, and that the hashes are not being salted.
+ c. If the password is hashed with a standard algorithm in unsalted form,
+query online hash databases to determine the corresponding cleartext
+password value.
+```
+
