@@ -285,11 +285,11 @@ received, using your intercepting proxy.
 2. Repeat the login process numerous times, modifying pieces of the data
 submitted in unexpected ways. For example, for each request parameter
 or cookie sent by the client, do the following:
- a. Submit an empty string as the value.
- b. Remove the name/value pair altogether.
- c. Submit very long and very short values.
- d. Submit strings instead of numbers and vice versa.
- e. Submit the same item multiple times, with the same and different
+ - Submit an empty string as the value.
+ - Remove the name/value pair altogether.
+ - Submit very long and very short values.
+ - Submit strings instead of numbers and vice versa.
+ - Submit the same item multiple times, with the same and different
 values.
 
 3. For each malformed request submitted, review closely the application’s
