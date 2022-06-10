@@ -1,6 +1,6 @@
 # Attacking Authentication
 
-```
+
 1. Manually submit several bad login attempts for an account you control, 
 monitoring the error messages you receive.
 
@@ -40,10 +40,10 @@ on every username. This approach has two benefits. First, you discover
 accounts with common passwords more quickly. Second, you are less 
 likely to trigger any account lockout defenses, because there is a time 
 delay between successive attempts using each individual account.
-```
+
 ## Verbose Failure Messages 
 
-```
+
 When a login attempt fails, you can of course infer that at least one piece of 
 information was incorrect. However, if the application tells you which piece of 
 information was invalid, you can exploit this behavior to considerably diminish 
@@ -55,10 +55,9 @@ reason for the failure was an unrecognized username or the wrong password,
 as illustrated in Figure 6-3
 
 Ex: Applying a username and application resopnding: "User is not recognized"
-```
 
 ## Enum Valid Usernames 
-```
+
 1. If you already know one valid username (for example, an account you 
 control), submit one login using this username and an incorrect password, 
 and another login using a random username.
@@ -93,11 +92,11 @@ the username and password in a single hit. To set the password field to
 be the same as the username, you can use the “battering ram” attack 
 mode in Burp Intruder to insert the same payload at multiple positions in 
 your login request.
-```
+
 
 ## Password Change Functionality
 
-```
+
  Vulnerabilities that are deliberately avoided in the main login function often reappear in the 
 password change function. Many web applications’ password change functions 
 are accessible without authentication and do the following:
@@ -135,7 +134,6 @@ and attempt to identify any patterns that may enable you to predict the
 URLs issued to other users. Employ the same techniques as are relevant to 
 analyzing session tokens for predictability (see Chapter 7).
 
-```
 
 ## Incomplete Validation of Credentials
 
@@ -194,7 +192,7 @@ user’s password without making a single attempt to log in as that user.
 Badly designed self-registration functionality can also provide a means for 
 username enumeration. If an application disallows duplicate usernames, an 
 attacker may attempt to register large numbers of common usernames to identify the existing usernames that are rejected.
-```
+
 1. If self-registration is possible, attempt to register the same username 
 twice with different passwords.
 
@@ -217,7 +215,7 @@ the existing password for the targeted account.
 and modify different data held within each account, to understand 
 whether this behavior can be used to gain unauthorized access to 
 other users’ accounts
-```
+
 
 ## Predictable Usernames 
 Some applications automatically generate account usernames according to 
@@ -225,7 +223,7 @@ a predictable sequence (cust5331, cust5332, and so on). When an application
 behaves like this, an attacker who can discern the sequence can quickly arrive 
 at a potentially exhaustive list of all valid usernames, which can be used as 
 the basis for further attacks
-```
+
 1. If the application generates usernames, try to obtain several in quick 
 succession, and determine whether any sequence or pattern can be 
 discerned.
@@ -233,7 +231,7 @@ discerned.
 2. If it can, extrapolate backwards to obtain a list of possible valid usernames. This can be used as the basis for a brute-force attack against the 
 login and other attacks where valid usernames are required, such as the 
 exploitation of access control flaws.
-```
+
 
 ## Predictable Passwords
 
@@ -248,7 +246,7 @@ In the most vulnerable cases, all users receive the same password, or one
 closely derived from their username or job function. In other cases, generated
 passwords may contain sequences that could be identifi ed or guessed with
 access to a very small sample of initial passwords
-```
+
 1. If the application generates passwords, try to obtain several in quick
 succession, and determine whether any sequence or pattern can be
 discerned.
@@ -261,10 +259,10 @@ corresponding inferred passwords.
 
 4. Otherwise, you can use the list of inferred passwords as the basis for a
 brute-force attack with a list of enumerated or common usernames.
-```
+
 ## Insecure Distribution of Credentials
 
-```
+
 1. Obtain a new account. If you are not required to set all credentials during
 registration, determine the means by which the application distributes
 credentials to new users.
@@ -276,10 +274,10 @@ recent and forthcoming users, and attempt to use these URLs to take ownership of
 
 3. Try to reuse a single activation URL multiple times, and see if the application allows this. If not, try locking out the target account before reusing
 the URL, and see if it now works.
-```
+
 ## Implementation Flaws in Authentication
 
-```
+
 1. Perform a complete, valid login using an account you control. Record
 every piece of data submitted to the application, and every response
 received, using your intercepting proxy.
@@ -300,10 +298,10 @@ response to identify any divergences from the base case.
 4. Feed these observations back into framing your test cases. When one
 modification causes a change in behavior, try to combine this with other
 changes to push the application’s logic to its limits.
-```
+
 ## Defects in Multi Stage Authentication
 
-```
+
 1. Perform a complete, valid login using an account you control. Record every
 piece of data submitted to the application using your intercepting proxy.
 
@@ -339,11 +337,11 @@ for stage three includes the parameter stage2complete=true, it may
 be possible to advance straight to stage three by setting this value. Try to
 modify the values being submitted, and determine whether this enables
 you to advance or skip stages.
-```
+
 ### Question & Answer Authentication Functionality
 
 The application may present a randomly chosen question and store the
-details within a hidden HTML form fi eld or cookie, rather than on the
+details within a hidden HTML form field or cookie, rather than on the
 server. The user subsequently submits both the answer and the question
 itself. This effectively allows an attacker to choose which question to
 answer, enabling the attacker to repeat a login after capturing a user’s
@@ -365,7 +363,7 @@ letters are randomly chosen each time the previous authentication stage is
 passed, an attacker who has captured a user’s login on a single occasion can
 simply reauthenticate up to this point until the two letters that he knows are
 requested, without the risk of account lockout.
-```
+
 1. If one of the login stages uses a randomly varying question, verify whether
 the details of the question are being submitted together with the answer.
 If so, change the question, submit the correct answer associated with that
@@ -375,7 +373,7 @@ question, and verify whether the login is still successful.
 question and answer, perform a partial login several times with a single
 account, proceeding each time as far as the varying question. If the question changes on each occasion, an attacker can still effectively choose
 which question to answer
-```
+
 
 ## Insecure Storage of Credientials
 
@@ -388,7 +386,7 @@ stored insecurely within the database. This may involve passwords being
 stored in cleartext. But if passwords are being hashed using a standard algorithm such as MD5 or SHA-1, this still allows an attacker to simply look up
 observed hashes against a precomputed database of hash values
 
-```
+
 1. Review all of the application’s authentication-related functionality, as well
 as any functions relating to user maintenance. If you find any instances in
 which a user’s password is transmitted back to the client, this indicates
@@ -405,5 +403,5 @@ assigned, and that the hashes are not being salted.
  c. If the password is hashed with a standard algorithm in unsalted form,
 query online hash databases to determine the corresponding cleartext
 password value.
-```
+
 
