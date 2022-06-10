@@ -159,15 +159,15 @@ fully validated or whether any limitations are in effect. You can then fine-tune
 your automated attacks against the login to remove unnecessary test cases, 
 thereby massively reducing the number of requests necessary to compromise 
 user accounts.
-```
- 1. Using an account you control, attempt to log in with variations on your 
+
+1. Using an account you control, attempt to log in with variations on your 
 own password: removing the last character, changing the case of a character, and removing any special typographical characters. If any of these 
 attempts is successful, continue experimenting to try to understand what 
 validation is actually occurring.
 
- 2. Feed any results back into your automated password-guessing attacks to 
+2. Feed any results back into your automated password-guessing attacks to 
 remove superfluous test cases and improve the chances of success.
-```
+
 
 ## Nounique Usernames
 Some applications that support self-registration allow users to specify their 
