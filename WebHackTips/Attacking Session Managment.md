@@ -149,3 +149,21 @@ To harvest large numbers of tokens in an automated way, ideally identify a singl
  
 ## Vulnerable Mapping of Tokens to Sessions
 
+A related but distinct weakness is for applications to use “static” tokens. These look like session tokens and may initially appear to function like them, but in fact they are no such thing. In these applications, each user is assigned a token, and this same token is reissued to the user every time he logs in. The application always accepts the token as valid regardless of whether the user has recently logged in and been issued with it. Applications like this really involve a misunderstanding about the whole concept of what a session is, and the beneﬁ ts it provides for managing and controlling access to the application. 
+
+1. Log in to the application twice using the same user account, either from different browser processes or from different computers. Determine whether both sessions remain active concurrently. If so, the application supports concurrent sessions, enabling an attacker who has compromised another user’s credentials to make use of these without risk of detection. 
+
+2. Log in and log out several times using the same user account, either from different browser processes or from different computers. Determine whether a new session token is issued each time or whether the same token is issued each time you log in. If the latter occurs, the application is not really employing proper sessions. 
+
+3. If tokens appear to contain any structure and meaning, attempt to separate out components that may identify the user from those that appear to be inscrutable. Try to modify any user-related components of the token so that they refer to other known users of the application, and verify whether the resulting token is accepted by the application and enables you to masquerade as that user.
+
+## Vulnerable Session Termination
+
+Proper termination of sessions is important for two reasons. First, keeping the life span of a session as short as is necessary reduces the window of opportunity within which an attacker may capture, guess, or misuse a valid session token. Second, it provides users with a means of invalidating an existing session when they no longer require it. This enables them to reduce this window further and to take some responsibility for securing their session in a shared computing environment. The main weaknesses in session termination functions involve failures to meet these two key objectives.
+
+- In some cases, a logout function is simply not implemented. Users have no means of causing the application to invalidate their session. 
+
+- In some cases, the logout function does not actually cause the server to invalidate the session. The server removes the token from the user’s browser (for example, by issuing a Set-Cookie instruction to blank the token). However, if the user continues to submit the token, the server still accepts it. 
+
+- In the worst cases, when a user clicks Logout, this fact is not communicated to the server, so the server performs no action. Rather, a client-side script is executed that blanks the user’s cookie, meaning that subsequent requests return the user to the login page. An attacker who gains access to this cookie could use the session as if the user had never logged out.
+
