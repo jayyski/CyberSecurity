@@ -27,3 +27,21 @@ If user-supplied data is being inserted into the structure of the SQL query itse
 - If supplying the number 1 causes a set of results with a column containing a 1 in every row, the input is probably being inserted into the name of a column being returned by the query. For example: ``` SELECT 1,title,year FROM books WHERE publisher=’Wiley’ ```
 
 Exploiting SQL injection in an ORDER BY clause is significantly different from most other cases. A database will not accept a UNION, WHERE, OR, or AND keyword at this point in the query. Generally exploitation requires the attacker to specify a nested query in place of the parameter, such as replacing the column name with (select 1 where <<condition>> or 1/0=0), thereby leveraging the inference techniques described later in this chapter. For databases that support batched queries such as MS-SQL, this can be the most efficient option
+
+ ## Fingerprinting the Database
+ 
+You have already seen how you can extract the version string of the major database types. Even if this cannot be done for some reason, it is usually possible to ﬁ ngerprint the database using other methods. One of the most reliable is the different means by which databases concatenate strings. In a query where you control some item of string data, you can supply a particular value in one request and then test different methods of concatenation to produce that string. When the same results are obtained, you have probably identiﬁed the type of database being used. The following examples show how the string services could be constructed on the common types of database:
+ 
+ - Oracle: ‘serv’||’ices’ 
+ - MS-SQL: ‘serv’+’ices’ 
+ - MySQL: ‘serv’ ‘ices’ (note the space) CONCAT('foo','bar')
+ - PostgreSQL: 	'foo'||'bar'
+ 
+- Microsoft, MySQL:	SELECT @@version
+- Oracle:	SELECT * FROM v$version
+- PostgreSQL:	SELECT version()
+ 
+If you are injecting into numeric data, the following attack strings can be used to ﬁ ngerprint the database. Each of these items evaluates to 0 on the target database and generates an error on the other databases:
+- Oracle: BITAND(1,1)-BITAND(1,1) 
+- MS-SQL: @@PACK_RECEIVED-@@PACK_RECEIVED 
+- MySQL: CONNECTION_ID()-CONNECTION_ID()
