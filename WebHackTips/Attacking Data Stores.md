@@ -1,20 +1,21 @@
 ## Injecting into Numeric Data
 
-When user-supplied numeric data is incorporated into a SQL query, the application may still handle this as string data by encapsulating it within single quotation marks. Therefore, you should always follow the steps described previously for string data. In most cases, however, numeric data is passed directly to the database in numeric form and therefore is not placed within single quotation marks. If none of the previous tests points toward the presence of a vulnerability, you can take some other speciﬁ c steps in relation to numeric data.
+When user-supplied numeric data is incorporated into a SQL query, the application may still handle this as string data by encapsulating it within single quotation marks. Therefore, you should always follow the steps described previously for string data. In most cases, however, numeric data is passed directly to the database in numeric form and therefore is not placed within single quotation marks. If none of the previous tests points toward the presence of a vulnerability, you can take some other speciﬁc steps in relation to numeric data.
 
 1. Try supplying a simple mathematical expression that is equivalent to the original numeric value. For example, if the original value is 2, try submitting 1+1 or 3-1. If the application responds in the same way, it may be vulnerable. 
  
 2. The preceding test is most reliable in cases where you have confirmed that the item being modified has a noticeable effect on the application’s behavior. For example, if the application uses a numeric PageID parameter to specify which content should be returned, substituting 1+1 for 2 with equivalent results is a good sign that SQL injection is present. However, if you can place arbitrary input into a numeric parameter without changing the application’s behavior, the preceding test provides no evidence of a vulnerability. 
 
 3. If the first test is successful, you can obtain further evidence of the vulnerability by using more complicated expressions that use SQL-specific keywords and syntax. A good example of this is the ASCII command, which returns the numeric ASCII code of the supplied character. For example, because the ASCII value of A is 65, the following expression is equivalent to 2 in SQL:
-67-ASCII(‘A’)
+```67-ASCII(‘A’)```
  
 4. The preceding test will not work if single quotes are being filtered. However, in this situation you can exploit the fact that databases implicitly convert numeric data to string data where required. Hence, because the ASCII value of the character 1 is 49, the following expression is equivalent to 2 in SQL:
-51-ASCII(1)
+```51-ASCII(1)```
 
 ## Injection into Query Structure
 
 If user-supplied data is being inserted into the structure of the SQL query itself, rather than an item of data within the query, exploiting SQL injection simply involves directly supplying valid SQL syntax. No “escaping” is required to break out of any data context. The most common injection point within the SQL query structure is within an ORDER BY clause. The ORDER BY keyword takes a column name or number and orders the result set according to the values in that column. This functionality is frequently exposed to the user to allow sorting of a table within the browser. A typical example is a sortable table of books that is retrieved using this query:
+
 ``` SELECT author, title, year FROM books WHERE publisher = ‘Wiley’ ORDER BY title ASC ```
 
 1. Make a note of any parameters that appear to control the order or field types within the results that the application returns. 
@@ -22,7 +23,8 @@ If user-supplied data is being inserted into the structure of the SQL query itse
 2. Make a series of requests supplying a numeric value in the parameter value, starting with the number 1 and incrementing it with each subsequent request: 
 
 - If changing the number in the input affects the ordering of the results, the input is probably being inserted into an ORDER BY clause. In SQL, ORDER BY 1 orders by the ﬁrst column. Increasing this number to 2 should then change the display order of data to order by the second column. If the number supplied is greater than the number of columns in the result set, the query should fail. In this situation, you can conﬁrm that further SQL can be injected by checking whether the results order can be reversed, using the following:
-``` 1 ASC -- , 1 DESC --  ```
+
+   ``` 1 ASC -- , 1 DESC --  ```
 
 - If supplying the number 1 causes a set of results with a column containing a 1 in every row, the input is probably being inserted into the name of a column being returned by the query. For example: ``` SELECT 1,title,year FROM books WHERE publisher=’Wiley’ ```
 
@@ -45,3 +47,19 @@ If you are injecting into numeric data, the following attack strings can be used
 - Oracle: BITAND(1,1)-BITAND(1,1) 
 - MS-SQL: @@PACK_RECEIVED-@@PACK_RECEIVED 
 - MySQL: CONNECTION_ID()-CONNECTION_ID()
+ 
+ ## Extracting Data
+ 
+To extract useful data from the database, normally you need to know the names of the tables and columns containing the data you want to access. The main enterprise DBMSs contain a rich amount of database metadata that you can query to discover the names of every table and column within the database. The methodology for extracting useful data is the same in each case; however, the details differ on different database platforms
+ 
+The information_schema is supported by MS-SQL, MySQL, and many other databases, including SQLite and Postgresql. It is designed to hold database metadata, making it a primary target for attackers wanting to examine the database. Note that Oracle doesn’t support this schema. When targeting an Oracle database, the attack would be identical in every other way. However, you would use the query SELECT table_name,column_name FROM all_tab_ columns to retrieve information about tables and columns in the database. (You would use the user_tab_columns table to focus on the current database only.) When analyzing large databases for points of attack, it is usually best to look directly for interesting column names rather than tables. For instance:
+``` 
+SELECT table_name,column_name FROM information_schema.columns where column_name LIKE ‘%PASS%’
+```
+
+ When multiple columns are returned from a target table, these can be concatenated into a single column. This makes retrieval more straightforward, because it requires identiﬁcation of only a single varchar ﬁeld in the original query: 
+ ```
+ - Oracle: SELECT table_name||’:’||column_name FROM all_tab_columns 
+ - MS-SQL: SELECT table_name+’:’+column_name from information_ schema.columns 
+ - MySQL: SELECT CONCAT(table_name,’:’,column_name) from information_schema.columns
+```
