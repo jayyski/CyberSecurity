@@ -28,7 +28,7 @@ If user-supplied data is being inserted into the structure of the SQL query itse
 
 - If supplying the number 1 causes a set of results with a column containing a 1 in every row, the input is probably being inserted into the name of a column being returned by the query. For example: ``` SELECT 1,title,year FROM books WHERE publisher=’Wiley’ ```
 
-Exploiting SQL injection in an ORDER BY clause is significantly different from most other cases. A database will not accept a UNION, WHERE, OR, or AND keyword at this point in the query. Generally exploitation requires the attacker to specify a nested query in place of the parameter, such as replacing the column name with (select 1 where <<condition>> or 1/0=0), thereby leveraging the inference techniques described later in this chapter. For databases that support batched queries such as MS-SQL, this can be the most efficient option
+Exploiting SQL injection in an ORDER BY clause is significantly different from most other cases. A database will not accept a UNION, WHERE, OR, or AND keyword at this point in the query. Generally exploitation requires the attacker to specify a nested query in place of the parameter, such as replacing the column name with ```(select 1 where <<condition>> or 1/0=0)```, thereby leveraging the inference techniques described later in this chapter. For databases that support batched queries such as MS-SQL, this can be the most efficient option
 
  ## Fingerprinting the Database
  
@@ -52,14 +52,25 @@ If you are injecting into numeric data, the following attack strings can be used
  
 To extract useful data from the database, normally you need to know the names of the tables and columns containing the data you want to access. The main enterprise DBMSs contain a rich amount of database metadata that you can query to discover the names of every table and column within the database. The methodology for extracting useful data is the same in each case; however, the details differ on different database platforms
  
-The information_schema is supported by MS-SQL, MySQL, and many other databases, including SQLite and Postgresql. It is designed to hold database metadata, making it a primary target for attackers wanting to examine the database. Note that Oracle doesn’t support this schema. When targeting an Oracle database, the attack would be identical in every other way. However, you would use the query SELECT table_name,column_name FROM all_tab_ columns to retrieve information about tables and columns in the database. (You would use the user_tab_columns table to focus on the current database only.) When analyzing large databases for points of attack, it is usually best to look directly for interesting column names rather than tables. For instance:
+The information_schema is supported by MS-SQL, MySQL, and many other databases, including SQLite and Postgresql. It is designed to hold database metadata, making it a primary target for attackers wanting to examine the database. Note that Oracle doesn’t support this schema. When targeting an Oracle database, the attack would be identical in every other way. However, you would use the query ```SELECT table_name,column_name FROM all_tab_ columns``` to retrieve information about tables and columns in the database. (You would use the user_tab_columns table to focus on the current database only.) When analyzing large databases for points of attack, it is usually best to look directly for interesting column names rather than tables. For instance:
 ``` 
 SELECT table_name,column_name FROM information_schema.columns where column_name LIKE ‘%PASS%’
 ```
 
  When multiple columns are returned from a target table, these can be concatenated into a single column. This makes retrieval more straightforward, because it requires identiﬁcation of only a single varchar ﬁeld in the original query: 
  ```
- - Oracle: SELECT table_name||’:’||column_name FROM all_tab_columns 
- - MS-SQL: SELECT table_name+’:’+column_name from information_ schema.columns 
- - MySQL: SELECT CONCAT(table_name,’:’,column_name) from information_schema.columns
+  Oracle: SELECT table_name||’:’||column_name FROM all_tab_columns 
+  MS-SQL: SELECT table_name+’:’+column_name from information_ schema.columns 
+  MySQL: SELECT CONCAT(table_name,’:’,column_name) from information_schema.columns
 ```
+## Avoiding Blocked Characters
+
+If the application removes or encodes some characters that are often used in SQL injection attacks, you may still be able to perform an attack without these: 
+
+ - The single quotation mark is not required if you are injecting into a numeric data ﬁeld or column name. If you need to introduce a string into your attack payload, you can do this without needing quotes. You can use various string functions to dynamically construct a string using the ASCII codes for individual characters. For example, the following two queries for Oracle and MS-SQL, respectively, are the equivalent of ```select ename, sal from emp where ename=’marcus’```:
+
+```
+ SELECT ename, sal FROM emp where ename=CHR(109)||CHR(97)|| CHR(114)||CHR(99)||CHR(117)||CHR(115)
+ SELECT ename, sal FROM emp WHERE ename=CHAR(109)+CHAR(97) +CHAR(114)+CHAR(99)+CHAR(117)+CHAR(115)
+```
+
