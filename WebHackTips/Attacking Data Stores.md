@@ -63,6 +63,7 @@ SELECT table_name,column_name FROM information_schema.columns where column_name 
   MS-SQL: SELECT table_name+’:’+column_name from information_ schema.columns 
   MySQL: SELECT CONCAT(table_name,’:’,column_name) from information_schema.columns
 ```
+# Bypassing Filters
 ## Avoiding Blocked Characters
 
 If the application removes or encodes some characters that are often used in SQL injection attacks, you may still be able to perform an attack without these: 
