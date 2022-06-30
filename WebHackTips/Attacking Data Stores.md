@@ -32,7 +32,7 @@ Exploiting SQL injection in an ORDER BY clause is significantly different from m
 
  ## Fingerprinting the Database
  
-You have already seen how you can extract the version string of the major database types. Even if this cannot be done for some reason, it is usually possible to ﬁ ngerprint the database using other methods. One of the most reliable is the different means by which databases concatenate strings. In a query where you control some item of string data, you can supply a particular value in one request and then test different methods of concatenation to produce that string. When the same results are obtained, you have probably identiﬁed the type of database being used. The following examples show how the string services could be constructed on the common types of database:
+You have already seen how you can extract the version string of the major database types. Even if this cannot be done for some reason, it is usually possible to ﬁngerprint the database using other methods. One of the most reliable is the different means by which databases concatenate strings. In a query where you control some item of string data, you can supply a particular value in one request and then test different methods of concatenation to produce that string. When the same results are obtained, you have probably identiﬁed the type of database being used. The following examples show how the string services could be constructed on the common types of database:
  
  - Oracle: ‘serv’||’ices’ 
  - MS-SQL: ‘serv’+’ices’ 
@@ -73,4 +73,35 @@ If the application removes or encodes some characters that are often used in SQL
  SELECT ename, sal FROM emp where ename=CHR(109)||CHR(97)|| CHR(114)||CHR(99)||CHR(117)||CHR(115)
  SELECT ename, sal FROM emp WHERE ename=CHAR(109)+CHAR(97) +CHAR(114)+CHAR(99)+CHAR(117)+CHAR(115)
 ```
+- If the comment symbol is blocked, you can often craft your injected data such that it does not break the syntax of the surrounding query, even without using this. For example, instead of injecting:
+```
+‘ or 1=1--
+```
+you can inject:
+```
+‘ or ‘a’=’a
+```
+- When attempting to inject batched queries into an MS-SQL database, you do not need to use the semicolon separator. Provided that you fix the syntax of all queries in the batch, the query parser will interpret them correctly, whether or not you include a semicolon.
 
+## Circumventing Simple Validation
+
+Some input validation routines employ a simple blacklist and either block or remove any supplied data that appears on this list. In this instance, you should try the standard attacks, looking for common defects in validation and canoni-calization mechanisms, as described in Chapter 2. For example, if the ```SELECT``` keyword is being blocked or removed, you can try the following bypasses:
+
+```
+SeLeCt
+%00SELECT
+SELSELECTECT
+%53%45%4c%45%43%54
+%2553%2545%254c%2545%2543%2554
+```
+
+## Using SQL Comments
+
+You can insert inline comments into SQL statements in the same way as for C++, by embedding them between the symbols /* and */. If the application blocks or strips spaces from your input, you can use comments to simulate whitespace within your injected data. For example:
+```
+SELECT/*foo*/username,password/*foo*/FROM/*foo*/users
+```
+In MySQL, comments can even be inserted within keywords themselves, which provides another means of bypassing some input validation filters while preserving the syntax of the actual query. For example:
+```
+SEL/*foo*/ECT username,password FR/*foo*/OM users
+```
