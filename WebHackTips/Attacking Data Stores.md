@@ -106,3 +106,31 @@ In MySQL, comments can even be inserted within keywords themselves, which provid
 ```
 SEL/*foo*/ECT username,password FR/*foo*/OM users
 ```
+## Second Order Sql Injection
+
+A second-order SQL Injection, on the other hand, is a vulnerability exploitable in two different steps:
+
+   - Firstly, we STORE a particular user-supplied input value in the DB and
+   - Secondly, we use the stored value to exploit a vulnerability in a vulnerable function in the source code which constructs the dynamic query of the web application.
+
+So let’s get down to business and look at how a vulnerable application could be exploited in more detail with the help of a hypothetical scenario:
+
+It could be possible to exploit some functions that don’t need user input and uses data already saved in the DB, that retrieves when needed. The password reset functionality!
+
+A victim user “User123” could be registered on the website with a very strong and secure password but we still really want to get his account. In a second order SQL Injection we should be able to do something like:
+
+Register a new account. We want to name this new user as ```“User123' — “``` and password ```“UserPass@123”```
+
+Payload: ```“User123' — “```
+
+Then we can reset our password and set a new one in the appropriate form.
+
+The legit query will be:
+
+```$pwdreset = mysql_query(“UPDATE users SET password=’getrekt’ WHERE username=’User123' — ‘ and password=’UserPass@123'”);```
+
+BUT since — is the character used to comment in SQL, the query will result being this:
+
+```$pwdreset = mysql_query(“UPDATE users SET password=’getrekt’ WHERE username=’User123'”);```
+
+And boom! You’re there. This will set a new password chosen by us for the victim user account!
