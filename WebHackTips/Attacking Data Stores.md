@@ -134,3 +134,24 @@ BUT since — is the character used to comment in SQL, the query will result bei
 ```$pwdreset = mysql_query(“UPDATE users SET password=’getrekt’ WHERE username=’User123'”);```
 
 And boom! You’re there. This will set a new password chosen by us for the victim user account!
+
+## Retrieving Data as Numbers
+
+It is fairly common to find that no string fields within an application are vulnerable to SQL injection, because input containing single quotation marks is being handled properly. However, vulnerabilities may still exist within numeric data fields, where user input is not encapsulated within single quotes. Often in these situations, the only means of retrieving the results of your injected queries is via a numeric response from the application.
+
+In this situation, your challenge is to process the results of your injected queries in such a way that meaningful data can be retrieved in numeric form.
+Two key functions can be used here:
+ - ```ASCII```, which returns the ASCII code for the input character
+ - ```SUBSTRING``` (or ```SUBSTR``` in Oracle), which returns a substring of its input
+These functions can be used together to extract a single character from a string in numeric form. For example:
+  
+  ```SUBSTRING(‘Admin’,1,1)``` returns A.
+  
+  ```ASCII(‘A’)``` returns 65.
+
+Therefore:
+
+ ```ASCII(SUBSTR(‘Admin’,1,1))``` returns 65.
+
+Using these two functions, you can systematically cut a string of useful data into its individual characters and return each of these separately, in numeric
+form. In a scripted attack, this technique can be used to quickly retrieve and reconstruct a large amount of string-based data one byte at a time.
