@@ -205,6 +205,7 @@ The following query tests whether an invented user AAAAAA exists. Because the WH
 ```SELECT 1/0 FROM dual WHERE (SELECT username FROM all_users WHERE username = ‘AAAAAA’) = ‘AAAAAA'```
 
 References:
+
 https://www.invicti.com/blog/web-security/sql-injection-cheat-sheet/#MySQLIf
 
 https://portswigger.net/web-security/sql-injection/cheat-sheet
