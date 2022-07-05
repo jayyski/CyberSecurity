@@ -206,4 +206,5 @@ The following query tests whether an invented user AAAAAA exists. Because the WH
 
 References:
 https://www.invicti.com/blog/web-security/sql-injection-cheat-sheet/#MySQLIf
+
 https://portswigger.net/web-security/sql-injection/cheat-sheet
