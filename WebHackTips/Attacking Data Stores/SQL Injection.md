@@ -185,3 +185,21 @@ Submitting the following input, however, results in a failed login, because the 
 ```admin’ AND ASCII(SUBSTRING(‘Admin’,1,1)) = 66--``` 
 
 By submitting a large number of such queries, cycling through the range of likely ASCII codes for each character until a hit occurs, you can extract the entire string, one byte at a time
+
+## Inducing Conditional Errors
+
+In some cases, you may be injecting into a query that has no noticeable effect on the application’s behavior, such as a logging mechanism. In other cases, you may be injecting a subquery or a batched query whose results are not processed by the application in any way. In this situation, you may struggle to find a way to cause a detectable difference in behavior that is contingent on a specified condition.
+
+David Litchfield devised a technique that can be used to trigger a detectable difference in behavior in most circumstances. The core idea is to inject a query that induces a database error contingent on some specified condition. When a database error occurs, it is often externally detectable, either through an HTTP 500 response code or through some kind of error message or anomalous behavior (even if the error message itself does not disclose any useful information).
+
+This causes the database to work through each row of table Y, evaluating condition C, and returning X in those cases where condition C is true. If condition C is never true, the expression X is never evaluated.
+
+This behavior can be exploited by finding an expression X that is syntactically  valid but that generates an error if it is ever evaluated. An example of such an expression in Oracle and MS-SQL is a divide-by-zero computation, such as 1/0. If condition C is ever true, expression X is evaluated, causing a database error. If condition C is always false, no error is generated. You can, therefore, use the presence or absence of an error to test an arbitrary condition C. 
+
+An example of this is the following query, which tests whether the default Oracle user DBSNMP exists. If this user exists, the expression 1/0 is evaluated, causing an error:
+
+```SELECT 1/0 FROM dual WHERE (SELECT username FROM all_users WHERE username = ‘DBSNMP’) = ‘DBSNMP’```
+
+The following query tests whether an invented user AAAAAA exists. Because the WHERE condition is never true, the expression 1/0 is not evaluated, so no error occurs:
+
+```SELECT 1/0 FROM dual WHERE (SELECT username FROM all_users WHERE username = ‘AAAAAA’) = ‘AAAAAA'```
