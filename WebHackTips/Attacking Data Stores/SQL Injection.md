@@ -203,3 +203,7 @@ An example of this is the following query, which tests whether the default Oracl
 The following query tests whether an invented user AAAAAA exists. Because the WHERE condition is never true, the expression 1/0 is not evaluated, so no error occurs:
 
 ```SELECT 1/0 FROM dual WHERE (SELECT username FROM all_users WHERE username = ‘AAAAAA’) = ‘AAAAAA'```
+
+References:
+https://www.invicti.com/blog/web-security/sql-injection-cheat-sheet/#MySQLIf
+https://portswigger.net/web-security/sql-injection/cheat-sheet
