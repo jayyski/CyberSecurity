@@ -204,6 +204,29 @@ The following query tests whether an invented user AAAAAA exists. Because the WH
 
 ```SELECT 1/0 FROM dual WHERE (SELECT username FROM all_users WHERE username = ‘AAAAAA’) = ‘AAAAAA'```
 
+Furthermore, because of the technique’s simplicity, the same attack strings will work on a range of databases, and where the injection point is into various types of SQL statements. This technique is also versatile because it can be used in all kinds of injection points where a subquery can be injected. For example:
+
+```(select 1 where <<condition>> or 1/0=0)```
+## Summary
+
+Most of the currently available tools use the following approach to exploit
+SQL injection vulnerabilities:
+
+- Brute-force all parameters in the target request to locate SQL injection
+points.
+
+- Determine the location of the vulnerable field within the back-end SQL query by appending various characters such as closing brackets, comment characters, and SQL keywords.
+
+- Attempt to perform a UNION attack by brute-forcing the number of required columns and then identifying a column with the varchar data type, which
+can be used to return results. 
+
+- Inject custom queries to retrieve arbitrary data — if necessary, concatenating data from multiple columns into a string that can be retrieved through a single result of the varchar data type.
+
+- If results cannot be retrieved using UNION, inject Boolean conditions (AND 1=1, AND 1=2, and so on) into the query to determine whether conditional responses can be used to retrieve data.
+
+- If results cannot be retrieved by injecting conditional expressions, try using conditional time delays to retrieve data
+
+
 References:
 
 https://www.invicti.com/blog/web-security/sql-injection-cheat-sheet/#MySQLIf
