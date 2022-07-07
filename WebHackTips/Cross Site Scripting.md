@@ -19,3 +19,21 @@ If your intention is simply to identify some instance of XSS within the applicat
 “><scr<script>ipt>alert(document.cookie)</scr</script>ipt>
 %00“><script>alert(document.cookie)</script>
 ```
+
+ 1. Choose a unique arbitrary string that does not appear anywhere within the application and that contains only alphabetical characters and there-fore is unlikely to be affected by any XSS-specific filters. For example:
+
+       ```myxsstestdmqlwp```
+
+Submit this string as every parameter to every page, targeting only one parameter at a time.
+
+ 2. Monitor the application’s responses for any appearance of this same string. Make a note of every parameter whose value is being copied into
+the application’s response. These are not necessarily vulnerable, but each instance identified is a candidate for further investigation, as described in the next section.
+
+ 3. Note that both GET and POST requests need to be tested. You should include every parameter within both the URL query string and the mes-
+sage body. Although a smaller range of delivery mechanisms exists for XSS vulnerabilities that can be triggered only by a POST request, exploitation is still possible, as previously described.
+
+ 4. In any cases where XSS was found in a POST request, use the “change request method” option in Burp to determine whether the same attack could be performed as a GET request.
+
+ 5. In addition to the standard request parameters, you should test every instance in which the application processes the contents of an HTTP
+request header. A common XSS vulnerability arises in error messages, where items such as the Referer and User-Agent headers are copied
+into the message’s contents. These headers are valid vehicles for delivering a reflected XSS attack, because an attacker can use a Flash object to induce a victim to issue a request containing arbitrary HTTP headers.
