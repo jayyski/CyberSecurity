@@ -105,6 +105,21 @@ Going further, you can insert NULL bytes at any position:
 ```
 (In these examples, [%XX] indicates the literal character with the hexadecimal ASCII code of XX. When submitting your attack to the application, generally you would use the URL-encoded form of the character. When reviewing the application’s response, you need to look for the literal decoded character being reflected.)
 
- TIP The NULL byte trick works on Internet Explorer anywhere within the HTML page. Liberal use of NULL bytes in XSS attacks often provides a quick way to bypass signature-based filters that are unaware of IE’s behavior. Using NULL bytes has historically proven effective against web application firewalls (WAFs) configured to block requests containing known attack strings. Because WAFs typically are written in native code for performance reasons, a NULL byte terminates the string in which it appears. This prevents the WAF from seeing the malicious payload that comes after the NULL (see Chapter 16 for more details)
+ **TIP** The NULL byte trick works on Internet Explorer anywhere within the HTML page. Liberal use of NULL bytes in XSS attacks often provides a quick way to bypass signature-based filters that are unaware of IE’s behavior. Using NULL bytes has historically proven effective against web application firewalls (WAFs) configured to block requests containing known attack strings. Because WAFs typically are written in native code for performance reasons, a NULL byte terminates the string in which it appears. This prevents the WAF from seeing the malicious payload that comes after the NULL (see Chapter 16 for more details)
+ 
+**Space Following the Tag Name**
+Several characters can replace the space between the tag name and the first attribute name:
+``` 
+<img/onerror=alert(1) src=a>
+<img[%09]onerror=alert(1) src=a>
+<img[%0d]onerror=alert(1) src=a>
+<img[%0a]onerror=alert(1) src=a>
+<img/”onerror=alert(1) src=a>
+<img/’onerror=alert(1) src=a>
+<img/anyjunk/onerror=alert(1) src=a>
+```
+Note that even where an attack does not require any tag attributes, you should always try adding some superfluous content after the tag name, because this bypasses some simple filters:
+
+ ```<script/anyjunk>alert(1)</script>```
  
  References: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwim7cD06oL5AhWZk4kEHcDGAzMQFnoECAYQAQ&url=http%3A%2F%2Fwww.xss-payloads.com%2F&usg=AOvVaw1-hKbfrHEIcldlShn1bjoC
