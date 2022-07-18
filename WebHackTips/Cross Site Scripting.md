@@ -108,7 +108,8 @@ Going further, you can insert NULL bytes at any position:
  **TIP** The NULL byte trick works on Internet Explorer anywhere within the HTML page. Liberal use of NULL bytes in XSS attacks often provides a quick way to bypass signature-based filters that are unaware of IE’s behavior. Using NULL bytes has historically proven effective against web application firewalls (WAFs) configured to block requests containing known attack strings. Because WAFs typically are written in native code for performance reasons, a NULL byte terminates the string in which it appears. This prevents the WAF from seeing the malicious payload that comes after the NULL (see Chapter 16 for more details)
  
 **Space Following the Tag Name**
-Several characters can replace the space between the tag name and the first attribute name:
+
+ Several characters can replace the space between the tag name and the first attribute name:
 ``` 
 <img/onerror=alert(1) src=a>
 <img[%09]onerror=alert(1) src=a>
