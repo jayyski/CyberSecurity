@@ -53,3 +53,20 @@ fore is unlikely to be affected by any XSS-specific filters. For example:
 4. In any cases where XSS was found in a POST request, use the “change request method” option in Burp to determine whether the same attack could be performed as a GET request.
 
 5. In addition to the standard request parameters, you should test every instance in which the application processes the contents of an HTTP request header. A common XSS vulnerability arises in error messages, where items such as the Referer and User-Agent headers are copied into the message’s contents. These headers are valid vehicles for delivering a reflected XSS attack, because an attacker can use a Flash object to induce a victim to issue a request containing arbitrary HTTP headers.
+
+## Testing Reflections to Introduce Script
+
+You must manually investigate each instance of reflected input that you have identified to verify whether it is actually exploitable. In each location where data is reflected in the response, you need to identify the syntactic context of that data. You must find a way to modify your input such that, when it is copied into the same location in the application’s response, it results in execution of arbitrary script. Let’s look at some examples.
+
+Example 1: A Tag Attribute Value
+Suppose that the returned page contains the following:
+ 
+```<input type=”text” name=”address1” value=”myxsstestdmqlwp”>```
+
+One obvious way to craft an XSS exploit is to terminate the double quotation marks that enclose the attribute value, close the <input> tag, and then employ some means of introducing JavaScript, such as a <script> tag. For example:
+
+ ```“><script>alert(1)</script>```
+
+An alternative method in this situation, which may bypass certain input filters, is to remain within the <input> tag itself but inject an event handler containing JavaScript. For example:
+ 
+```“ onfocus=”alert(1)```
