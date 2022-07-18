@@ -95,7 +95,9 @@ possible XSS attack was detected, as shown in Figure 12-8.
  ## Bypassing Filters:HTML
  
 Starting with the opening tag name, the most simple and naïve filters can be bypassed simply by varying the case of the characters used:
-```<iMg onerror=alert(1) src=a>```
+
+ ```<iMg onerror=alert(1) src=a>```
+
 Going further, you can insert NULL bytes at any position:
 ```
 <[%00]img onerror=alert(1) src=a>
