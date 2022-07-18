@@ -70,3 +70,39 @@ One obvious way to craft an XSS exploit is to terminate the double quotation mar
 An alternative method in this situation, which may bypass certain input filters, is to remain within the <input> tag itself but inject an event handler containing JavaScript. For example:
  
 ```“ onfocus=”alert(1)```
+ 
+## Probing Defense Filters
+
+Very often, you will discover that the server modifies your initial attempted exploits in some way, so they do not succeed in executing your injected script. 
+ 
+If this happens, do not give up! Your next task is to determine what server-side processing is occurring that is affecting your input. There are three broad possibilities:
+
+ - The application (or a web application firewall protecting the application) has identified an attack signature and has blocked your input.
+
+ - The application has accepted your input but has performed some kind of sanitization or encoding on the attack string.
+
+ - The application has truncated your attack string to a fixed maximum length. We will look at each scenario in turn and discuss various ways in which the obstacles presented by the application’s processing can be bypassed.
+
+## Beating Signature-Based Filters
+ 
+ In the first type of filter, the application typically responds to your attack string
+with an entirely different response than it did for the harmless string. For
+example, it might respond with an error message, possibly even stating that a
+possible XSS attack was detected, as shown in Figure 12-8.
+ 
+ If this occurs, the next step is to determine what characters or expressions within your input are triggering the filter. An effective approach is to remove different parts of your string in turn and see whether the input is still being blocked. Typically, this process establishes fairly quickly that a specific expression such as <script> is causing the request to be blocked. You then need to test the filter to establish whether any bypasses exist. There are so many different ways to introduce script code into HTML pages that signature-based filters normally can be bypassed. You can find an alternative means of introducing script, or you can use slightly malformed syntax that browsers tolerate. This section examines the numerous different methods of executing scripts. Then it describes a wide range of techniques that can be used to bypass common filters.
+ 
+ ## Bypassing Filters:HTML
+ 
+Starting with the opening tag name, the most simple and naïve filters can be bypassed simply by varying the case of the characters used:
+```<iMg onerror=alert(1) src=a>```
+Going further, you can insert NULL bytes at any position:
+```
+<[%00]img onerror=alert(1) src=a>
+<i[%00]mg onerror=alert(1) src=a>
+```
+(In these examples, [%XX] indicates the literal character with the hexadecimal ASCII code of XX. When submitting your attack to the application, generally you would use the URL-encoded form of the character. When reviewing the application’s response, you need to look for the literal decoded character being reflected.)
+
+ TIP The NULL byte trick works on Internet Explorer anywhere within the HTML page. Liberal use of NULL bytes in XSS attacks often provides a quick way to bypass signature-based filters that are unaware of IE’s behavior. Using NULL bytes has historically proven effective against web application firewalls (WAFs) configured to block requests containing known attack strings. Because WAFs typically are written in native code for performance reasons, a NULL byte terminates the string in which it appears. This prevents the WAF from seeing the malicious payload that comes after the NULL (see Chapter 16 for more details)
+ 
+ References: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwim7cD06oL5AhWZk4kEHcDGAzMQFnoECAYQAQ&url=http%3A%2F%2Fwww.xss-payloads.com%2F&usg=AOvVaw1-hKbfrHEIcldlShn1bjoC
