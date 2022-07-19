@@ -323,6 +323,20 @@ For example, if the filter strips ```<script>``` recursively and then strips ```
 <scr<object>ipt>alert(1)</script>
 ```
 
- 
- 
+ When you are injecting into a quoted string in an existing script, it is common to find that the application sanitizes your input by placing the backslash character before any quotation mark characters you submit. This escapes your quotation marks, preventing you from terminating the string and injecting arbitrary script. In this situation, you should always verify whether the backslash character itself is being escaped. If not, a simple filter bypass is possible.
+For example, if you control the value foo in:
+
+```
+var a = ‘foo’;
+```
+you can inject:
+```
+foo\’; alert(1);//
+```
+ This results in the following response, in which your injected script exe-
+cutes. Note the use of the JavaScript comment character // to comment out the remainder of the line, thus preventing a syntax error caused by the application’s own string delimiter:
+
+```
+var a = ‘foo\\’; alert(1);//’;
+```
 References: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwim7cD06oL5AhWZk4kEHcDGAzMQFnoECAYQAQ&url=http%3A%2F%2Fwww.xss-payloads.com%2F&usg=AOvVaw1-hKbfrHEIcldlShn1bjoC
