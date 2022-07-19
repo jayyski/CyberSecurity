@@ -272,6 +272,57 @@ If the dot character is being blocked, you can use other methods to perform dere
 <script>with(document)alert(cookie)</script>
 ```
  
+**Combining Multiple Techniques**
+
+The techniques described so far can often be used in combination to apply several layers of obfuscation to your attack. Furthermore, in cases where JavaScript is being used within an HTML tag attribute (via an event handler, scripting pseudo-protocol, or dynamically evaluated style), you can combine these techniques with HTML encoding. The browser HTML-decodes the tag attribute value before the JavaScript it contains is interpreted. In the following example, the “e” character in “alert” has been escaped using Unicode escaping, and the backslash used in the Unicode escape has been HTML-encoded:
+
+```
+<img onerror=eval(‘al&#x5c;u0065rt(1)’) src=a>
+```
+
+Of course, any of the other characters within the onerror attribute value could also be HTML-encoded to further hide the attack:
+
+```
+<img onerror=&#x65;&#x76;&#x61;&#x6c;&#x28;&#x27;al&#x5c;u0065rt&#x28;1&
+#x29;&#x27;&#x29; src=a>
+```
+
+This technique enables you to bypass many filters on JavaScript code, because you can avoid using any JavaScript keywords or other syntax such as quotes, periods, and brackets
+ 
+**Using Encoded Scripts**
+
+On Internet Explorer, you can use Microsoft’s custom script-encoding algorithm to hide the contents of scripts and potentially bypass some input filters:
+
+```
+<img onerror=”VBScript.Encode:#@~^CAAAAA==\ko$K6,FoQIAAA==^#~@” src=a>
+<img language=”JScript.Encode” onerror=”#@~^CAAAAA==C^+.D`8#mgIAAA==^#~@” src=a>
+```
+This encoding was originally designed to prevent users from inspecting client-side scripts easily by viewing the source code for the HTML page. It has since been reverse-engineered, and numerous tools and websites will let you decode encoded scripts. You can encode your own scripts for use in attacks via Microsoft’s command-line utility srcenc in older versions of Windows.
+ 
+**Beating Sanitization** 
+ 
+When you encounter this defense, your first step is to determine precisely which characters and expressions are being sanitized, and whether it is still possible to carry out an attack without directly employing these characters and expressions. For example, if your data is being inserted directly into an existing script, you may not need to employ any HTML tag characters. Or, if the application is removing <script> tags from your input, you may be able to use a different tag with a suitable event handler. Here, you should consider all the techniques already discussed for dealing with signature-based filters, including using layers of encoding, NULL bytes, nonstandard syntax, and obfuscated script code. By modifying your input in the various ways described, you may be able to devise an attack that does not contain any of the characters or expressions that the filter is sanitizing and therefore successfully bypass it. If it appears impossible to perform an attack without using input that is being sanitized, you need to test the effectiveness of the sanitizing filter to establish whether any bypasses exist.
+
+ 
+ As described in Chapter 2, several mistakes often appear in sanitizing filters. Some string manipulation APIs contain methods to replace only the first instance of a matched expression, and these are sometimes easily confused with methods that replace all instances. So if <script> is being stripped from your input, you should try the following to check whether all instances are being removed:
+ 
+```
+<script><script>alert(1)</script>
+```
+ 
+In this situation, you should also check whether the sanitization is being performed recursively:
+
+```
+<scr<script>ipt>alert(1)</script>
+```
+
+Furthermore, if the filter performs several sanitizing steps on your input, you should check whether the order or interplay between these can be exploited.
+For example, if the filter strips ```<script>``` recursively and then strips ```<object>``` recursively, the following attack may succeed:
+
+```
+<scr<object>ipt>alert(1)</script>
+```
+
  
  
 References: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwim7cD06oL5AhWZk4kEHcDGAzMQFnoECAYQAQ&url=http%3A%2F%2Fwww.xss-payloads.com%2F&usg=AOvVaw1-hKbfrHEIcldlShn1bjoC
