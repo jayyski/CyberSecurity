@@ -333,10 +333,13 @@ you can inject:
 ```
 foo\’; alert(1);//
 ```
- This results in the following response, in which your injected script exe-
-cutes. Note the use of the JavaScript comment character // to comment out the remainder of the line, thus preventing a syntax error caused by the application’s own string delimiter:
+ 
+This results in the following response, in which your injected script executes. Note the use of the JavaScript comment character // to comment out the remainder of the line, thus preventing a syntax error caused by the application’s own string delimiter:
 
 ```
 var a = ‘foo\\’; alert(1);//’;
 ```
+ 
+ 
+ 
 References: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwim7cD06oL5AhWZk4kEHcDGAzMQFnoECAYQAQ&url=http%3A%2F%2Fwww.xss-payloads.com%2F&usg=AOvVaw1-hKbfrHEIcldlShn1bjoC
