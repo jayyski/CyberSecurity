@@ -92,7 +92,7 @@ possible XSS attack was detected, as shown in Figure 12-8.
  
  If this occurs, the next step is to determine what characters or expressions within your input are triggering the filter. An effective approach is to remove different parts of your string in turn and see whether the input is still being blocked. Typically, this process establishes fairly quickly that a specific expression such as <script> is causing the request to be blocked. You then need to test the filter to establish whether any bypasses exist. There are so many different ways to introduce script code into HTML pages that signature-based filters normally can be bypassed. You can find an alternative means of introducing script, or you can use slightly malformed syntax that browsers tolerate. This section examines the numerous different methods of executing scripts. Then it describes a wide range of techniques that can be used to bypass common filters.
  
- ## Bypassing Filters:HTML
+ **Bypassing Filters:HTML**
  
 Starting with the opening tag name, the most simple and naïve filters can be bypassed simply by varying the case of the characters used:
 
@@ -340,6 +340,6 @@ This results in the following response, in which your injected script executes. 
 var a = ‘foo\\’; alert(1);//’;
 ```
  
- 
+
  
 References: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwim7cD06oL5AhWZk4kEHcDGAzMQFnoECAYQAQ&url=http%3A%2F%2Fwww.xss-payloads.com%2F&usg=AOvVaw1-hKbfrHEIcldlShn1bjoC
